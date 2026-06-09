@@ -43,7 +43,7 @@ export default function AnnouncementSection() {
           ))
         ) : (
           <div className="text-center text-gray-400 border border-zinc-800 bg-zinc-900 p-6 rounded-xl">
-            No announcements available right now.
+            No new announcements available right now.
           </div>
         )}
       </div>
@@ -51,7 +51,7 @@ export default function AnnouncementSection() {
       <div className="text-center mt-10">
         <Link
           to="/news"
-          className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-xl font-semibold"
+          className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 px-6 py-3 font-semibold text-white shadow-lg shadow-blue-600/30 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-600/40 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-black disabled:cursor-not-allowed disabled:opacity-60"
         >
           View All News
         </Link>

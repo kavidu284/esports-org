@@ -39,11 +39,15 @@ export default function NewsDetails() {
       </h1>
 
       <p className="text-gray-400 mt-3">
-        {new Date(news.created_at).toLocaleDateString()}
+        {news.created_at
+          ? new Date(news.created_at).toLocaleDateString()
+          : "No Date"}
       </p>
 
-      <div className="mt-8 text-lg text-gray-300">
-        {news.message}
+      <div className="mt-8 bg-zinc-900 p-8 rounded-2xl border border-zinc-800">
+        <p className="text-lg text-gray-300 leading-relaxed">
+          {news.message}
+        </p>
       </div>
 
     </div>

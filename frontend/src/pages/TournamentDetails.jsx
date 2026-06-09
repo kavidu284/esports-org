@@ -71,7 +71,25 @@ export default function TournamentDetails() {
         </p>
 
       </div>
+      <div className="mt-10 bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
 
+        <h2 className="text-2xl font-bold mb-4">
+          Tournament Rules
+        </h2>
+
+        <p className="text-gray-400 mb-4">
+          Please read the official tournament rules before
+          registering for this event.
+        </p>
+
+        <Link
+          to="/rules"
+          className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 px-6 py-3 font-semibold text-white shadow-lg shadow-blue-600/30 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-600/40 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-black disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          View Rules
+        </Link>
+
+      </div>
       <div className="mt-10">
 
         <h2 className="text-3xl font-bold mb-4">
@@ -90,7 +108,7 @@ export default function TournamentDetails() {
         {tournament.show_registration && (
           <Link
             to={`/register/${tournament.id}`}
-            className="bg-blue-600 px-6 py-3 rounded-xl"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 px-6 py-3 font-semibold text-white shadow-lg shadow-blue-600/30 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-600/40 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-black disabled:cursor-not-allowed disabled:opacity-60"
           >
             Register Team
           </Link>
@@ -98,13 +116,13 @@ export default function TournamentDetails() {
         )}
 
         {tournament.show_schedule && (
-          <button className="bg-zinc-800 hover:bg-zinc-700 px-6 py-3 rounded-xl font-semibold">
+          <button className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-700 bg-zinc-800 px-6 py-3 font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-zinc-500 focus:ring-offset-2 focus:ring-offset-black disabled:cursor-not-allowed disabled:opacity-60">
             Schedule
           </button>
         )}
 
         {tournament.show_results && (
-          <button className="bg-zinc-800 hover:bg-zinc-700 px-6 py-3 rounded-xl font-semibold">
+          <button className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-700 bg-zinc-800 px-6 py-3 font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-zinc-500 focus:ring-offset-2 focus:ring-offset-black disabled:cursor-not-allowed disabled:opacity-60">
             Results
           </button>
         )}

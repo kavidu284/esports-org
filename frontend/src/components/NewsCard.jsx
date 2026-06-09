@@ -14,7 +14,7 @@ export default function NewsCard({ news }) {
 
       <Link
         to={`/news/${news.id}`}
-        className="inline-block mt-5 text-blue-500 font-semibold"
+        className="mt-5 inline-flex items-center gap-1 font-semibold text-blue-400 transition-colors duration-300 hover:text-blue-300"
       >
         Read More →
       </Link>

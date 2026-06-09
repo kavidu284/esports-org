@@ -10,6 +10,8 @@ import RegisterTeam from "./pages/RegisterTeam";
 import Contact from "./pages/Contact";
 import Gallery from "./pages/Gallery";
 import NotFound from "./pages/NotFound";
+import About from "./pages/About";
+import Rules from "./pages/Rules";
 
 
 
@@ -28,6 +30,8 @@ function App() {
         <Route path="/register/:id" element={<RegisterTeam />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/gallery" element={<Gallery />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/rules" element={<Rules />} />
         <Route path="*" element={<NotFound />} />
 
       </Routes>

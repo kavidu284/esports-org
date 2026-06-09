@@ -206,7 +206,7 @@ export default function RegisterTeam() {
             <button
               type="submit"
               disabled={!agree}
-              className="bg-blue-600 hover:bg-blue-700 disabled:bg-zinc-700 px-10 py-4 rounded-xl text-xl font-bold transition"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 px-10 py-4 text-xl font-semibold text-white shadow-lg shadow-blue-600/30 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-600/40 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-black disabled:cursor-not-allowed disabled:opacity-60"
             >
               Submit Registration
             </button>
