@@ -22,7 +22,7 @@ export default function AdminLanding() {
         </p>
 
         <Link
-          to="/admin/dashboard"
+          to="/admin/login"
           className="bg-blue-600 hover:bg-blue-700 px-8 py-4 rounded-xl font-semibold text-lg"
         >
           Enter Admin Panel
