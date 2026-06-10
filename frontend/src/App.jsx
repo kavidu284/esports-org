@@ -20,6 +20,7 @@ import AdminTournaments from "./admin/TournamentsAdmin";
 import CreateTournament from "./admin/CreateTournament";
 import EditTournament from "./admin/EditTournament";
 import RegistrationsAdmin from "./admin/registrationAdmin.jsx";
+import RegistrationDetails from "./admin/registationDetails.jsx";
 
 
 
@@ -52,6 +53,7 @@ function App() {
           <Route path="tournaments/create" element={<CreateTournament />} />
           <Route path="tournaments/edit/:id" element={<EditTournament />} />
           <Route path="registrations" element={<RegistrationsAdmin />} />
+          <Route path="registrations/:id" element={<RegistrationDetails />} />
         </Route>
       </Routes>
        {!isAdmin && <Footer />}

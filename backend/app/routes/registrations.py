@@ -270,9 +270,7 @@ def get_registration(
     return registration
 
 @router.put("/registrations/{registration_id}/approve")
-def approve_registration(
-    registration_id: int
-):
+def approve_registration(registration_id: int):
 
     connection = get_connection()
     cursor = connection.cursor()
@@ -288,13 +286,7 @@ def approve_registration(
 
     connection.commit()
 
-    cursor.close()
-    connection.close()
-
-    return {
-        "message": "Team Approved"
-    }
-    
+    return {"message": "Team Approved"}
 @router.put("/registrations/{registration_id}/reject")
 def reject_registration(
     registration_id: int
@@ -339,3 +331,34 @@ def get_registrations():
     connection.close()
 
     return registrations
+@router.get("/registrations/{registration_id}/full")
+def get_registration_full(registration_id: int):
+
+    connection = get_connection()
+    cursor = connection.cursor(dictionary=True)
+
+    cursor.execute(
+        "SELECT * FROM registrations WHERE id=%s",
+        (registration_id,)
+    )
+
+    registration = cursor.fetchone()
+
+    cursor.execute(
+        """
+        SELECT *
+        FROM players
+        WHERE registration_id=%s
+        """,
+        (registration_id,)
+    )
+
+    players = cursor.fetchall()
+
+    cursor.close()
+    connection.close()
+
+    return {
+        "registration": registration,
+        "players": players
+    }
