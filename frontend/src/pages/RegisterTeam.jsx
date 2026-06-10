@@ -1,70 +1,47 @@
 import { useState } from "react";
-
-const PlayerSection = ({ title }) => (
-  <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mb-6">
-    <h3 className="text-2xl font-bold text-blue-400 mb-6">{title}</h3>
-
-    <div className="grid md:grid-cols-2 gap-4">
-      <input type="file" placeholder="Player Image" className="bg-zinc-800 p-3 rounded-lg" />
-
-      <input
-        type="text"
-        placeholder="Real Name"
-        className="bg-zinc-800 p-3 rounded-lg"
-      />
-
-      <input
-        type="text"
-        placeholder="IGN"
-        className="bg-zinc-800 p-3 rounded-lg"
-      />
-
-      <input
-        type="text"
-        placeholder="MLBB ID"
-        className="bg-zinc-800 p-3 rounded-lg"
-      />
-
-      <input
-        type="text"
-        placeholder="Server ID"
-        className="bg-zinc-800 p-3 rounded-lg"
-      />
-    </div>
-  </div>
-);
-// submit handler moved into component so we can access the form element
+import { useParams } from "react-router-dom";
+import PlayerSection from "../components/PlayerSection";
+import api from "../services/api";
 
 export default function RegisterTeam() {
+  const { id } = useParams();
+
   const [agree, setAgree] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
 
-    const form = e.target;
-    const formData = new FormData(form);
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    try {
-      const res = await fetch('/register', {
-        method: 'POST',
-        body: formData,
-      });
+  const formData = new FormData(e.target);
 
-      if (!res.ok) throw new Error('Network response was not ok');
+  formData.append("tournament_id", id);
 
-      alert('Registration Submitted Successfully!');
-      form.reset();
-      setAgree(false);
+  try {
+    const response = await api.post(
+      "/registrations/register",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
 
-    } catch (error) {
-      console.error(error);
-      alert('Registration Failed');
-    }
-  };
+    alert(response.data.message);
+
+    e.target.reset();
+    setAgree(false);
+
+  } catch (error) {
+    console.error(error);
+    alert("Registration Failed");
+  }
+};
+
+
 
   return (
     <div className="bg-black min-h-screen text-white">
-
       <div className="max-w-6xl mx-auto px-6 py-12">
 
         <h1 className="text-5xl font-black text-center mb-3">
@@ -75,9 +52,13 @@ export default function RegisterTeam() {
           Monarchy Esports Official Registration Form
         </p>
 
-        <form className="space-y-8" onSubmit={handleSubmit}>
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-8"
+          encType="multipart/form-data"
+        >
 
-          {/* Team Information */}
+          {/* TEAM INFORMATION */}
 
           <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8">
 
@@ -89,13 +70,16 @@ export default function RegisterTeam() {
 
               <input
                 type="text"
+                name="team_name"
                 placeholder="Team Name"
+                required
                 className="bg-zinc-800 p-3 rounded-lg"
               />
 
               <input
                 type="file"
-                placeholder="Team Logo"
+                name="team_logo"
+                required
                 className="bg-zinc-800 p-3 rounded-lg"
               />
 
@@ -103,7 +87,7 @@ export default function RegisterTeam() {
 
           </div>
 
-          {/* Captain */}
+          {/* CAPTAIN INFORMATION */}
 
           <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8">
 
@@ -115,25 +99,33 @@ export default function RegisterTeam() {
 
               <input
                 type="text"
+                name="captain_name"
                 placeholder="Captain Name"
+                required
                 className="bg-zinc-800 p-3 rounded-lg"
               />
 
               <input
                 type="email"
+                name="captain_email"
                 placeholder="Captain Email"
+                required
                 className="bg-zinc-800 p-3 rounded-lg"
               />
 
               <input
                 type="text"
+                name="captain_phone"
                 placeholder="Captain Phone"
+                required
                 className="bg-zinc-800 p-3 rounded-lg"
               />
 
               <input
                 type="text"
+                name="discord_username"
                 placeholder="Discord Username"
+                required
                 className="bg-zinc-800 p-3 rounded-lg"
               />
 
@@ -141,28 +133,56 @@ export default function RegisterTeam() {
 
           </div>
 
-          {/* Main Players */}
+          {/* MAIN PLAYERS */}
 
           <h2 className="text-4xl font-bold text-center text-blue-500">
             Main Roster
           </h2>
 
-          <PlayerSection title="Player 1 (Captain)" />
-          <PlayerSection title="Player 2" />
-          <PlayerSection title="Player 3" />
-          <PlayerSection title="Player 4" />
-          <PlayerSection title="Player 5" />
+          <PlayerSection
+            title="Player 1 (Captain)"
+            prefix="player1"
+          />
 
-          {/* Subs */}
+          <PlayerSection
+            title="Player 2"
+            prefix="player2"
+          />
+
+          <PlayerSection
+            title="Player 3"
+            prefix="player3"
+          />
+
+          <PlayerSection
+            title="Player 4"
+            prefix="player4"
+          />
+
+          <PlayerSection
+            title="Player 5"
+            prefix="player5"
+          />
+
+          {/* SUBSTITUTES */}
 
           <h2 className="text-4xl font-bold text-center text-blue-500">
             Substitute Players
           </h2>
 
-          <PlayerSection title="Substitute 1" />
-          <PlayerSection title="Substitute 2" />
+          <PlayerSection
+            title="Substitute 1"
+            prefix="sub1"
+            required={false}
+          />
 
-          {/* Verification */}
+          <PlayerSection
+            title="Substitute 2"
+            prefix="sub2"
+            required={false}
+          />
+
+          {/* VERIFICATION */}
 
           <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8">
 
@@ -176,6 +196,8 @@ export default function RegisterTeam() {
 
             <input
               type="file"
+              name="lobby_screenshot"
+              required
               className="bg-zinc-800 p-3 rounded-lg w-full"
             />
 
@@ -184,29 +206,27 @@ export default function RegisterTeam() {
               <input
                 type="checkbox"
                 checked={agree}
-                onChange={() =>
-                  setAgree(!agree)
-                }
+                onChange={() => setAgree(!agree)}
               />
 
               <label>
-                I agree to the Monarchy Esports
-                tournament rules and confirm
-                all submitted information is correct.
+                I agree to the Monarchy Esports tournament
+                rules and confirm all submitted
+                information is correct.
               </label>
 
             </div>
 
           </div>
 
-          {/* Submit */}
+          {/* SUBMIT */}
 
           <div className="text-center">
 
             <button
               type="submit"
               disabled={!agree}
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 px-10 py-4 text-xl font-semibold text-white shadow-lg shadow-blue-600/30 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-600/40 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-black disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 px-10 py-4 text-xl font-semibold text-white shadow-lg shadow-blue-600/30 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-600/40 disabled:opacity-50"
             >
               Submit Registration
             </button>
@@ -214,10 +234,8 @@ export default function RegisterTeam() {
           </div>
 
         </form>
-        
 
       </div>
-
     </div>
   );
 }

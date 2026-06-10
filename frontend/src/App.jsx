@@ -19,6 +19,7 @@ import Layout from "./admin/AdminLayout";
 import AdminTournaments from "./admin/TournamentsAdmin";
 import CreateTournament from "./admin/CreateTournament";
 import EditTournament from "./admin/EditTournament";
+import RegistrationsAdmin from "./admin/registrationAdmin.jsx";
 
 
 
@@ -44,12 +45,13 @@ function App() {
         <Route path="/rules" element={<Rules />} />
         <Route path="/admin" element={<AdminLanding />} />
         <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="*" element={<NotFound />} />
         <Route path="/admin/*" element={<Layout />}>
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="tournaments" element={<AdminTournaments />} />
           <Route path="tournaments/create" element={<CreateTournament />} />
           <Route path="tournaments/edit/:id" element={<EditTournament />} />
-          <Route path="*" element={<NotFound />} />
+          <Route path="registrations" element={<RegistrationsAdmin />} />
         </Route>
       </Routes>
        {!isAdmin && <Footer />}

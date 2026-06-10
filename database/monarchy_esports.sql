@@ -65,26 +65,9 @@ CREATE TABLE registrations (
     captain_email VARCHAR(150),
     captain_phone VARCHAR(30),
 
-    player1 VARCHAR(100) NOT NULL,
-    player1_photo VARCHAR(500) NOT NULL,
+    discord_username VARCHAR(100),
 
-    player2 VARCHAR(100) NOT NULL,
-    player2_photo VARCHAR(500) NOT NULL,
-
-    player3 VARCHAR(100) NOT NULL,
-    player3_photo VARCHAR(500) NOT NULL,
-
-    player4 VARCHAR(100) NOT NULL,
-    player4_photo VARCHAR(500) NOT NULL,
-
-    player5 VARCHAR(100) NOT NULL,
-    player5_photo VARCHAR(500) NOT NULL,
-
-    sub1 VARCHAR(100),
-    sub1_photo VARCHAR(500),
-
-    sub2 VARCHAR(100),
-    sub2_photo VARCHAR(500),
+    lobby_screenshot VARCHAR(500),
 
     status ENUM(
         'Pending',
@@ -98,6 +81,35 @@ CREATE TABLE registrations (
     REFERENCES tournaments(id)
     ON DELETE CASCADE
 );
+
+-- =====================================
+-- PLAYERS
+-- =====================================
+
+CREATE TABLE players (
+
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    registration_id INT NOT NULL,
+
+    real_name VARCHAR(100) NOT NULL,
+    ign VARCHAR(100) NOT NULL,
+
+    mlbb_id VARCHAR(50) NOT NULL,
+    server_id VARCHAR(50) NOT NULL,
+
+    player_photo VARCHAR(500),
+
+    is_substitute BOOLEAN DEFAULT FALSE,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (registration_id)
+    REFERENCES registrations(id)
+    ON DELETE CASCADE
+);
+
+
 
 -- =====================================
 -- ANNOUNCEMENTS
@@ -236,66 +248,55 @@ TRUE,
 
 INSERT INTO registrations
 (
-tournament_id,
-team_name,
-captain_name,
-captain_email,
-captain_phone,
-
-player1,
-player1_photo,
-
-player2,
-player2_photo,
-
-player3,
-player3_photo,
-
-player4,
-player4_photo,
-
-player5,
-player5_photo,
-
-sub1,
-sub1_photo,
-
-sub2,
-sub2_photo,
-
-status
+    tournament_id,
+    team_name,
+    team_logo,
+    captain_name,
+    captain_email,
+    captain_phone,
+    discord_username,
+    lobby_screenshot,
+    status
 )
 VALUES
 (
-1,
-'Team Phoenix',
-'Kavidu',
-'kavidu@example.com',
-'0771234567',
-
-'Player One',
-'/players/p1.jpg',
-
-'Player Two',
-'/players/p2.jpg',
-
-'Player Three',
-'/players/p3.jpg',
-
-'Player Four',
-'/players/p4.jpg',
-
-'Player Five',
-'/players/p5.jpg',
-
-'Sub One',
-'/players/s1.jpg',
-
-'Sub Two',
-'/players/s2.jpg',
-
-'Pending'
+    1,
+    'Team Phoenix',
+    '/uploads/team_phoenix.png',
+    'Kavidu',
+    'kavidu@example.com',
+    '0771234567',
+    'kavidu#1234',
+    '/uploads/lobby.jpg',
+    'Pending'
 );
+
+-- =====================================
+-- DUMMY PLAYERS
+-- =====================================
+
+INSERT INTO players
+(
+    registration_id,
+    real_name,
+    ign,
+    mlbb_id,
+    server_id,
+    player_photo,
+    is_substitute
+)
+VALUES
+
+(1,'Kavidu Wijenayaka','Phoenix','12345678','5678','/uploads/p1.jpg',FALSE),
+(1,'Player Two','Shadow','22345678','5678','/uploads/p2.jpg',FALSE),
+(1,'Player Three','Reaper','32345678','5678','/uploads/p3.jpg',FALSE),
+(1,'Player Four','Storm','42345678','5678','/uploads/p4.jpg',FALSE),
+(1,'Player Five','Blaze','52345678','5678','/uploads/p5.jpg',FALSE),
+
+(1,'Sub One','Ghost','62345678','5678','/uploads/s1.jpg',TRUE),
+(1,'Sub Two','Nova','72345678','5678','/uploads/s2.jpg',TRUE);
+
+
 
 -- =====================================
 -- DUMMY ANNOUNCEMENTS
