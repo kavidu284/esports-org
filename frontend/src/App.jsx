@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Tournaments from "./pages/Tournaments";
@@ -12,13 +12,23 @@ import Gallery from "./pages/Gallery";
 import NotFound from "./pages/NotFound";
 import About from "./pages/About";
 import Rules from "./pages/Rules";
+import AdminLanding from "./pages/AdminLanding";
+import AdminLogin from "./pages/AdminLogin";
+import Dashboard from "./admin/Dashboard";
+import Layout from "./admin/AdminLayout";
+import AdminTournaments from "./admin/TournamentsAdmin";
+import CreateTournament from "./admin/CreateTournament";
+import EditTournament from "./admin/EditTournament";
 
 
 
 function App() {
+  const location = useLocation();
+  const isAdmin = location.pathname.startsWith("/admin");
+
   return (
     <>
-      <Navbar />
+      {!isAdmin && <Navbar />}
 
       <Routes>
 
@@ -32,10 +42,17 @@ function App() {
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/about" element={<About />} />
         <Route path="/rules" element={<Rules />} />
-        <Route path="*" element={<NotFound />} />
-
+        <Route path="/admin" element={<AdminLanding />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/*" element={<Layout />}>
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="tournaments" element={<AdminTournaments />} />
+          <Route path="tournaments/create" element={<CreateTournament />} />
+          <Route path="tournaments/edit/:id" element={<EditTournament />} />
+          <Route path="*" element={<NotFound />} />
+        </Route>
       </Routes>
-      <Footer />
+       {!isAdmin && <Footer />}
     </>
   );
 }

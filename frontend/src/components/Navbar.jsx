@@ -21,7 +21,8 @@ export default function Navbar() {
             alt="Monarchy Esports"
             className="w-14 h-14 object-contain"
           />
-
+          </Link>
+          <Link to="/">
           <div>
             <h1 className="text-3xl font-black">
               <span className="text-blue-500">
