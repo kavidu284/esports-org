@@ -38,7 +38,9 @@ def send_message(data: dict):
     return {
         "message": "Message Sent Successfully"
     }
-    
+
+
+# GET ALL MESSAGES
 @router.get("/messages")
 def get_messages():
 
@@ -57,3 +59,52 @@ def get_messages():
     connection.close()
 
     return messages
+
+
+# GET SINGLE MESSAGE
+@router.get("/messages/{message_id}")
+def get_message(message_id: int):
+
+    connection = get_connection()
+    cursor = connection.cursor(dictionary=True)
+
+    cursor.execute(
+        """
+        SELECT *
+        FROM contact_messages
+        WHERE id = %s
+        """,
+        (message_id,)
+    )
+
+    message = cursor.fetchone()
+
+    cursor.close()
+    connection.close()
+
+    return message
+
+
+# DELETE MESSAGE
+@router.delete("/messages/{message_id}")
+def delete_message(message_id: int):
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        DELETE FROM contact_messages
+        WHERE id = %s
+        """,
+        (message_id,)
+    )
+
+    connection.commit()
+
+    cursor.close()
+    connection.close()
+
+    return {
+        "message": "Message Deleted Successfully"
+    }

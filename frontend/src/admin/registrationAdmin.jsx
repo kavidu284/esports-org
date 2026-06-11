@@ -7,28 +7,6 @@ export default function RegistrationsAdmin() {
   const [registrations, setRegistrations] = useState([]);
   const navigate = useNavigate();
 
-  const approveTeam = async (id) => {
-    try {
-      await api.post(`/registrations/${id}/approve`);
-      setRegistrations((prev) =>
-        prev.map((t) => (t.id === id ? { ...t, status: "approved" } : t))
-      );
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const rejectTeam = async (id) => {
-    try {
-      await api.post(`/registrations/${id}/reject`);
-      setRegistrations((prev) =>
-        prev.map((t) => (t.id === id ? { ...t, status: "rejected" } : t))
-      );
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   useEffect(() => {
     let mounted = true;
 
@@ -58,12 +36,12 @@ export default function RegistrationsAdmin() {
       <div className="space-y-4">
 
         {registrations.map((team) => (
-
+          
           <div
             key={team.id}
             className="bg-zinc-900 p-6 rounded-xl"
           >
-
+            <img className="w-14 h-14 object-contain" src= {team.logo}></img>
             <h2 className="text-2xl font-bold">
               {team.team_name}
             </h2>
@@ -81,30 +59,18 @@ export default function RegistrationsAdmin() {
             </p>
             <div className="flex gap-3">
 
-              <button
-                onClick={() =>
-                  navigate(`/admin/registrations/${team.id}`)
-                }
-                className="bg-blue-600 px-4 py-2 rounded-lg"
-              >
-                View
-              </button>
-
-            </div>
-
             <button
-              onClick={() => approveTeam(team.id)}
-              className="bg-green-600 px-4 py-2 rounded-lg"
+              onClick={() =>
+                navigate(`/admin/registrations/${team.id}`)
+              }
+              className="bg-blue-600 px-4 py-2 rounded-lg"
             >
-              Approve
+              View
             </button>
 
-            <button
-              onClick={() => rejectTeam(team.id)}
-              className="bg-red-600 px-4 py-2 rounded-lg"
-            >
-              Reject
-            </button>
+          </div>
+
+           
           </div>
 
         ))}

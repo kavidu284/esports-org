@@ -24,6 +24,7 @@ import RegistrationDetails from "./admin/registationDetails.jsx";
 import NewsAdmin from "./admin/NewsAdmin";
 import CreateNews from "./admin/CreateNews";
 import Editnews from "./admin/editNews";
+import MessagesAdmin from "./admin/MessageAdmin";
 
 
 
@@ -60,6 +61,7 @@ function App() {
           <Route path="news" element={<NewsAdmin />} />
           <Route path="news/create" element={<CreateNews />} />
           <Route path="news/edit/:id" element={<Editnews />} />
+          <Route path="messages" element={<MessagesAdmin />} />
         </Route>
       </Routes>
        {!isAdmin && <Footer />}

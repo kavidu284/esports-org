@@ -49,7 +49,7 @@ export default function AdminLayout() {
           </Link>
 
           <Link
-            to="/admin/contacts"
+            to="/admin/messages"
             className="block p-3 rounded-lg hover:bg-zinc-800"
           >
             Contact Messages
