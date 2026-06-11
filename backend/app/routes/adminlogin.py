@@ -1,5 +1,8 @@
 from fastapi import APIRouter
 from app.database import get_connection
+from app.auth import create_access_token
+
+
 
 router = APIRouter()
 
@@ -32,11 +35,17 @@ def admin_login(data: dict):
             "success": False,
             "message": "Invalid Credentials"
         }
-
+    
+    token = create_access_token(
+        {
+            "admin_id": admin["id"],
+            "username": admin["username"]
+        })
     return {
         "success": True,
+        "access_token": token,
         "admin": {
             "id": admin["id"],
             "username": admin["username"]
         }
-    }
+}

@@ -1,5 +1,7 @@
 from fastapi import APIRouter
 from app.database import get_connection
+from fastapi import Depends
+from app.dependencies.auth import get_current_admin
 
 router = APIRouter()
 
@@ -48,7 +50,7 @@ def get_announcement(announcement_id: int):
 
 # CREATE ANNOUNCEMENT
 @router.post("/announcements")
-def create_announcement(data: dict):
+def create_announcement(data: dict , current_admin: dict = Depends(get_current_admin)):
 
     connection = get_connection()
     cursor = connection.cursor()
@@ -83,7 +85,8 @@ def create_announcement(data: dict):
 @router.put("/announcements/{announcement_id}")
 def update_announcement(
     announcement_id: int,
-    data: dict
+    data: dict,
+    current_admin: dict = Depends(get_current_admin)
 ):
 
     connection = get_connection()
@@ -117,7 +120,8 @@ def update_announcement(
 # DELETE ANNOUNCEMENT
 @router.delete("/announcements/{announcement_id}")
 def delete_announcement(
-    announcement_id: int
+    announcement_id: int,
+    current_admin: dict = Depends(get_current_admin)
 ):
 
     connection = get_connection()

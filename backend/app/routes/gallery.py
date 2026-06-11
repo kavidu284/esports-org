@@ -3,6 +3,8 @@ import shutil
 
 from fastapi import APIRouter, UploadFile, File, Form
 from app.database import get_connection
+from fastapi import Depends
+from app.dependencies.auth import get_current_admin
 
 router = APIRouter()
 
@@ -34,7 +36,8 @@ def get_gallery():
 async def create_gallery_image(
     tournament_id: int = Form(...),
     caption: str = Form(""),
-    image: UploadFile = File(...)
+    image: UploadFile = File(...),
+    current_admin: dict = Depends(get_current_admin)
 ):
 
     file_path = f"{UPLOAD_DIR}/{image.filename}"
@@ -77,7 +80,7 @@ async def create_gallery_image(
 
 
 @router.delete("/gallery/{image_id}")
-def delete_gallery_image(image_id: int):
+def delete_gallery_image(image_id: int, current_admin: dict = Depends(get_current_admin)):
 
     connection = get_connection()
     cursor = connection.cursor()

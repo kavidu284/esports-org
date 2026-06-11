@@ -1,11 +1,14 @@
 from fastapi import APIRouter
 from app.database import get_connection
+from fastapi import Depends
+from app.dependencies.auth import get_current_admin
 
 router = APIRouter()
 
 @router.get("/dashboard")
-def get_dashboard():
-
+def get_dashboard_data(
+    current_admin=Depends(get_current_admin)
+):
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
 

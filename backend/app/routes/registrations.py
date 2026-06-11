@@ -3,6 +3,8 @@ import shutil
 
 from fastapi import APIRouter, UploadFile, File, Form
 from app.database import get_connection
+from fastapi import Depends
+from app.dependencies.auth import get_current_admin
 
 router = APIRouter()
 
@@ -270,7 +272,7 @@ def get_registration(
     return registration
 
 @router.put("/registrations/{registration_id}/approve")
-def approve_registration(registration_id: int):
+def approve_registration(registration_id: int, current_admin: dict = Depends(get_current_admin)):
 
     connection = get_connection()
     cursor = connection.cursor()
@@ -289,7 +291,8 @@ def approve_registration(registration_id: int):
     return {"message": "Team Approved"}
 @router.put("/registrations/{registration_id}/reject")
 def reject_registration(
-    registration_id: int
+    registration_id: int,
+    current_admin: dict = Depends(get_current_admin)
 ):
 
     connection = get_connection()
@@ -314,7 +317,7 @@ def reject_registration(
     }
     
 @router.get("/registrationsadmin")
-def get_registrations():
+def get_registrations(current_admin: dict = Depends(get_current_admin)):
 
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
@@ -332,7 +335,7 @@ def get_registrations():
 
     return registrations
 @router.get("/registrations/{registration_id}/full")
-def get_registration_full(registration_id: int):
+def get_registration_full(registration_id: int, current_admin: dict = Depends(get_current_admin)):
 
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)

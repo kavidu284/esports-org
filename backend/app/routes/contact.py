@@ -1,5 +1,7 @@
 from fastapi import APIRouter
 from app.database import get_connection
+from fastapi import Depends
+from app.dependencies.auth import get_current_admin
 
 router = APIRouter()
 
@@ -42,7 +44,7 @@ def send_message(data: dict):
 
 # GET ALL MESSAGES
 @router.get("/messages")
-def get_messages():
+def get_messages(current_admin: dict = Depends(get_current_admin)):
 
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
@@ -63,7 +65,7 @@ def get_messages():
 
 # GET SINGLE MESSAGE
 @router.get("/messages/{message_id}")
-def get_message(message_id: int):
+def get_message(message_id: int, current_admin: dict = Depends(get_current_admin)):
 
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
@@ -87,7 +89,7 @@ def get_message(message_id: int):
 
 # DELETE MESSAGE
 @router.delete("/messages/{message_id}")
-def delete_message(message_id: int):
+def delete_message(message_id: int, current_admin: dict = Depends(get_current_admin)):
 
     connection = get_connection()
     cursor = connection.cursor()

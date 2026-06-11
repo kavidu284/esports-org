@@ -1,5 +1,7 @@
 from fastapi import APIRouter
 from app.database import get_connection
+from fastapi import Depends
+from app.dependencies.auth import get_current_admin
 
 router = APIRouter()
 
@@ -38,7 +40,7 @@ def get_tournament(tournament_id: int):
     return tournament
 
 @router.post("/tournaments")
-def create_tournament(data: dict):
+def create_tournament(data: dict, current_admin: dict = Depends(get_current_admin)):
 
     connection = get_connection()
     cursor = connection.cursor()
@@ -92,7 +94,7 @@ def create_tournament(data: dict):
     }
     
 @router.delete("/tournaments/{tournament_id}")
-def delete_tournament(tournament_id: int):
+def delete_tournament(tournament_id: int, current_admin: dict = Depends(get_current_admin)):
 
     connection = get_connection()
     cursor = connection.cursor()
@@ -113,7 +115,8 @@ def delete_tournament(tournament_id: int):
 @router.put("/tournaments/{tournament_id}")
 def update_tournament(
     tournament_id: int,
-    data: dict
+    data: dict,
+    current_admin: dict = Depends(get_current_admin)
 ):
 
     connection = get_connection()

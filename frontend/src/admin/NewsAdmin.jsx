@@ -50,7 +50,7 @@ export default function NewsAdmin() {
           News Management
         </h1>
 
-        <Link to="/admin/announcements/create">
+        <Link to="/admin/news/create">
           <button className="bg-blue-600 hover:bg-blue-700 px-5 py-3 rounded-lg">
             + Create Announcement
           </button>

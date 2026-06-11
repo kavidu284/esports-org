@@ -25,6 +25,8 @@ import NewsAdmin from "./admin/NewsAdmin";
 import CreateNews from "./admin/CreateNews";
 import Editnews from "./admin/editNews";
 import MessagesAdmin from "./admin/MessageAdmin";
+import GalleryAdmin from "./admin/GalleryAdmin";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 
 
@@ -51,17 +53,18 @@ function App() {
         <Route path="/admin" element={<AdminLanding />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="*" element={<NotFound />} />
-        <Route path="/admin/*" element={<Layout />}>
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="tournaments" element={<AdminTournaments />} />
-          <Route path="tournaments/create" element={<CreateTournament />} />
-          <Route path="tournaments/edit/:id" element={<EditTournament />} />
-          <Route path="registrations" element={<RegistrationsAdmin />} />
-          <Route path="registrations/:id" element={<RegistrationDetails />} />
-          <Route path="news" element={<NewsAdmin />} />
-          <Route path="news/create" element={<CreateNews />} />
-          <Route path="news/edit/:id" element={<Editnews />} />
-          <Route path="messages" element={<MessagesAdmin />} />
+        <Route path="/admin/*" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+          <Route path="dashboard" element={ <ProtectedRoute> <Dashboard /> </ProtectedRoute> } />
+          <Route path="tournaments" element={<ProtectedRoute><AdminTournaments /></ProtectedRoute>} />
+          <Route path="tournaments/create" element={<ProtectedRoute><CreateTournament /></ProtectedRoute>} />
+          <Route path="tournaments/edit/:id" element={<ProtectedRoute><EditTournament /></ProtectedRoute>} />
+          <Route path="registrations" element={<ProtectedRoute><RegistrationsAdmin /></ProtectedRoute>} />
+          <Route path="registrations/:id" element={<ProtectedRoute><RegistrationDetails /></ProtectedRoute>} />
+          <Route path="news" element={<ProtectedRoute><NewsAdmin /></ProtectedRoute>} />
+          <Route path="news/create" element={<ProtectedRoute><CreateNews /></ProtectedRoute>} />
+          <Route path="news/edit/:id" element={<ProtectedRoute><Editnews /></ProtectedRoute>} />
+          <Route path="messages" element={<ProtectedRoute><MessagesAdmin /></ProtectedRoute>} />
+          <Route path="gallery" element={<ProtectedRoute><GalleryAdmin /></ProtectedRoute>} />
         </Route>
       </Routes>
        {!isAdmin && <Footer />}
