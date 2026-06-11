@@ -7,6 +7,7 @@ from app.routes.registrations import router as registrations_router
 from app.routes.contact import router as contact_router
 from app.routes.gallery import router as gallery_router
 from app.routes.adminlogin import router as admin_login_router
+from app.routes.AdminDashboard import router as admin_dashboard_router
 
 app = FastAPI()
 
@@ -24,6 +25,7 @@ app.include_router(registrations_router)
 app.include_router(contact_router)
 app.include_router(gallery_router)
 app.include_router(admin_login_router)
+app.include_router(admin_dashboard_router)
 @app.get("/")
 def root():
     return {
