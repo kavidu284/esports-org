@@ -387,3 +387,31 @@ def get_tournament_registrations(tournament_id: int, current_admin: dict = Depen
     connection.close()
 
     return registrations
+
+
+@router.get("/tournaments/{tournament_id}/approved-teams")
+def get_approved_teams(tournament_id: int):
+
+    connection = get_connection()
+    cursor = connection.cursor(dictionary=True)
+
+    cursor.execute(
+        """
+        SELECT
+            id,
+            team_name,
+            team_logo
+        FROM registrations
+        WHERE tournament_id=%s
+        AND status='Approved'
+        ORDER BY team_name
+        """,
+        (tournament_id,)
+    )
+
+    teams = cursor.fetchall()
+
+    cursor.close()
+    connection.close()
+
+    return teams

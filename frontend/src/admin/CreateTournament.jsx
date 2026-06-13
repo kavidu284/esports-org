@@ -16,7 +16,8 @@ export default function CreateTournament() {
     registration_end: "",
     tournament_start: "",
     tournament_end: "",
-    max_teams: 32
+    max_teams: 64,
+    tournament_format: "Bracket Only"
   });
 
   const handleChange = (e) => {
@@ -45,7 +46,8 @@ export default function CreateTournament() {
 
 }
   };
-
+const [tournamentFormat, setTournamentFormat] =
+  useState("Bracket Only");
   return (
     <div>
 
@@ -139,7 +141,19 @@ export default function CreateTournament() {
           onChange={handleChange}
           className="w-full p-3 bg-zinc-900 rounded-lg"
         />
+        <select
+          value={tournamentFormat}
+          onChange={(e) => setTournamentFormat(e.target.value)}
+          className="w-full bg-zinc-900 p-4 rounded-lg"
+        >
+          <option value="Bracket Only">
+            Bracket Only
+          </option>
 
+          <option value="Round Robin + Bracket">
+            Round Robin + Bracket
+          </option>
+        </select>
         <input
           type="number"
           name="max_teams"

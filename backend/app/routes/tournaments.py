@@ -46,25 +46,26 @@ def create_tournament(data: dict, current_admin: dict = Depends(get_current_admi
     cursor = connection.cursor()
 
     query = """
-    INSERT INTO tournaments
-    (
-        title,
-        subtitle,
-        description,
-        game_name,
-        banner_image,
-        rulebook_url,
-        prize_pool,
-        status,
-        registration_start,
-        registration_end,
-        tournament_start,
-        tournament_end,
-        max_teams
-    )
-    VALUES
-    (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-    """
+INSERT INTO tournaments
+(
+    title,
+    subtitle,
+    description,
+    game_name,
+    banner_image,
+    rulebook_url,
+    prize_pool,
+    status,
+    registration_start,
+    registration_end,
+    tournament_start,
+    tournament_end,
+    max_teams,
+    tournament_format
+)
+VALUES
+(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+"""
 
     values = (
         data["title"],
@@ -79,7 +80,8 @@ def create_tournament(data: dict, current_admin: dict = Depends(get_current_admi
         data["registration_end"],
         data["tournament_start"],
         data["tournament_end"],
-        data["max_teams"]
+        data["max_teams"],
+        data["tournament_format"]
     )
 
     cursor.execute(query, values)
@@ -133,7 +135,8 @@ def update_tournament(
         rulebook_url=%s,
         prize_pool=%s,
         status=%s,
-        max_teams=%s
+        max_teams=%s,
+        tournament_format=%s
     WHERE id=%s
     """
 
@@ -147,6 +150,7 @@ def update_tournament(
         data["prize_pool"],
         data["status"],
         data["max_teams"],
+        data["tournament_format"],
         tournament_id
     )
 
@@ -160,3 +164,26 @@ def update_tournament(
     return {
         "message": "Tournament Updated"
     }
+    
+@router.get("/tournaments/{tournament_id}/matches")
+def get_matches(tournament_id: int):
+
+    connection = get_connection()
+    cursor = connection.cursor(dictionary=True)
+
+    cursor.execute(
+        """
+        SELECT *
+        FROM matches
+        WHERE tournament_id=%s
+        ORDER BY match_date, match_time
+        """,
+        (tournament_id,)
+    )
+
+    matches = cursor.fetchall()
+
+    cursor.close()
+    connection.close()
+
+    return matches

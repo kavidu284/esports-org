@@ -208,7 +208,25 @@ export default function TournamentsAdmin() {
               className="w-full p-3 bg-zinc-800 rounded-lg mb-4"
               placeholder="Prize Pool"
             />
+            <select
+              name="tournament_format"
+              value={editingTournament.tournament_format}
+              onChange={(e) =>
+                setEditingTournament({
+                  ...editingTournament,
+                  tournament_format: e.target.value
+                })
+              }
+              className="w-full p-3 bg-zinc-800 rounded-lg mb-4"
+            >
+              <option value="Bracket Only">
+                Bracket Only
+              </option>
 
+              <option value="Round Robin + Bracket">
+                Round Robin + Bracket
+              </option>
+            </select>
             <select
               value={editingTournament.status}
               onChange={(e) =>

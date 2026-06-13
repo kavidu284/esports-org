@@ -19,8 +19,10 @@ export default function TournamentDetails() {
       }
     };
 
+    
     if (id) {
       void fetchTournament();
+  
     }
   }, [id]);
 
@@ -114,18 +116,13 @@ export default function TournamentDetails() {
           </Link>
           
         )}
-
-        {tournament.show_schedule && (
-          <button className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-700 bg-zinc-800 px-6 py-3 font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-zinc-500 focus:ring-offset-2 focus:ring-offset-black disabled:cursor-not-allowed disabled:opacity-60">
-            Schedule
-          </button>
-        )}
-
-        {tournament.show_results && (
-          <button className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-700 bg-zinc-800 px-6 py-3 font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-zinc-500 focus:ring-offset-2 focus:ring-offset-black disabled:cursor-not-allowed disabled:opacity-60">
-            Results
-          </button>
-        )}
+        <Link
+          to={`/tournament/${tournament.id}/view`}
+          className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-700 bg-zinc-800 px-6 py-3 font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-zinc-700"
+        >
+          View Tournament
+        </Link>
+     
 
       </div>
 

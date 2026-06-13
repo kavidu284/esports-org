@@ -1,43 +1,77 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import api from "../services/api";
 
 export default function RegistrationsAdmin() {
   const [registrations, setRegistrations] = useState([]);
-  const navigate = useNavigate();
+  const [tournament, setTournament] = useState(null);
 
-  const fetchRegistrations = async () => {
-    try {
-      const response = await api.get("/registrationsadmin");
-      setRegistrations(response.data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  const navigate = useNavigate();
+  const { tournamentId } = useParams();
 
   useEffect(() => {
-    void (async () => {
-      await fetchRegistrations();
-    })();
-  }, []);
+    const fetchData = async () => {
+      try {
+        const tournamentRes = await api.get(
+          `/tournaments/${tournamentId}`
+        );
+        setTournament(tournamentRes.data);
+
+        const regRes = await api.get(
+          `/registrations/tournament/${tournamentId}`
+        );
+        setRegistrations(regRes.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    if (tournamentId) {
+      fetchData();
+    }
+  }, [tournamentId]);
 
   const approveTeam = async (id) => {
     try {
       await api.put(`/registrations/${id}/approve`);
-      fetchRegistrations();
-    } catch (error) {
-      console.error(error);
+
+      const res = await api.get(
+        `/registrations/tournament/${tournamentId}`
+      );
+      setRegistrations(res.data);
+    } catch (err) {
+      console.error(err);
     }
   };
 
   const rejectTeam = async (id) => {
     try {
       await api.put(`/registrations/${id}/reject`);
-      fetchRegistrations();
-    } catch (error) {
-      console.error(error);
+
+      const res = await api.get(
+        `/registrations/tournament/${tournamentId}`
+      );
+      setRegistrations(res.data);
+    } catch (err) {
+      console.error(err);
     }
   };
+
+  // ✅ LOADING STATE
+  if (!tournament) {
+    return (
+      <div className="text-white p-6">
+        Loading...
+      </div>
+    );
+  }
+
+  // ✅ FAST FIX: MATCH DATABASE VALUES EXACTLY
+  const status = tournament.status;
+
+  const isUpcoming = status === "Upcoming";
+  const isOngoing = status === "Ongoing";
+  const isCompleted = status === "Completed";
 
   return (
     <div>
@@ -45,77 +79,87 @@ export default function RegistrationsAdmin() {
         Registrations
       </h1>
 
-      <div className="space-y-4">
+      {/* UPCOMING */}
+      {isUpcoming && (
+        <div className="bg-yellow-800 p-6 rounded-xl">
+          Tournament begins soon. No registrations available yet.
+        </div>
+      )}
 
-        {registrations.map((team) => (
+      {/* ONGOING / COMPLETED */}
+      {(isOngoing || isCompleted) && (
+        <div className="space-y-4">
+          {Array.isArray(registrations) &&
+          registrations.length > 0 ? (
+            registrations.map((team) => (
+              <div
+                key={team.id}
+                className="bg-zinc-900 p-6 rounded-xl"
+              >
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-4">
+                    <img
+                      src={`${api.defaults.baseURL}/${team.team_logo}`}
+                      alt={team.team_name}
+                      className="w-20 h-20 rounded-lg object-cover"
+                    />
 
-          <div
-            key={team.id}
-            className="bg-zinc-900 p-6 rounded-xl"
-          >
-            <div className="flex justify-between items-center">
+                    <div>
+                      <h2 className="text-2xl font-bold">
+                        {team.team_name}
+                      </h2>
 
-    <div className="flex items-center gap-4">
+                      <p>Captain: {team.captain_name}</p>
+                      <p>Email: {team.captain_email}</p>
+                      <p>Status: {team.status}</p>
+                    </div>
+                  </div>
 
-      <img
-        src={`${api.defaults.baseURL}/${team.team_logo}`}
-        alt={team.team_name}
-        className="w-20 h-20 rounded-lg object-cover"
-      />
-      <div>
-        <h2 className="text-2xl font-bold">
-          {team.team_name}
-        </h2>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() =>
+                        navigate(
+                          `/admin/registrations/${team.id}`
+                        )
+                      }
+                      className="bg-blue-600 px-4 py-2 rounded-lg"
+                    >
+                      View
+                    </button>
 
-        <p>
-          Captain: {team.captain_name}
-        </p>
+                    {/* ONLY ONGOING */}
+                    {isOngoing && (
+                      <>
+                        <button
+                          onClick={() =>
+                            approveTeam(team.id)
+                          }
+                          className="bg-green-600 px-4 py-2 rounded-lg"
+                        >
+                          Approve
+                        </button>
 
-        <p>
-          Email: {team.captain_email}
-        </p>
-
-        <p>
-          Status: {team.status}
-        </p>
-      </div>
-
+                        <button
+                          onClick={() =>
+                            rejectTeam(team.id)
+                          }
+                          className="bg-red-600 px-4 py-2 rounded-lg"
+                        >
+                          Reject
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-white">
+              No teams registered.
+            </p>
+          )}
+        </div>
+      )}
     </div>
-
-    <div className="flex gap-3">
-
-      <button
-        onClick={() =>
-          navigate(`/admin/registrations/${team.id}`)
-        }
-        className="bg-blue-600 px-4 py-2 rounded-lg"
-      >
-        View
-      </button>
-
-      <button
-        onClick={() => approveTeam(team.id)}
-        className="bg-green-600 px-4 py-2 rounded-lg"
-      >
-        Approve
-      </button>
-
-      <button
-        onClick={() => rejectTeam(team.id)}
-        className="bg-red-600 px-4 py-2 rounded-lg"
-      >
-        Reject
-      </button>
-
-    </div>
-
-  </div>
-</div>
-        ) )}
-
-      </div>
-    </div>
-
   );
 }
-

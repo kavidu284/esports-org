@@ -170,8 +170,8 @@ CREATE TABLE matches (
 
     tournament_id INT NOT NULL,
 
-    team_a VARCHAR(255) NOT NULL,
-    team_b VARCHAR(255) NOT NULL,
+    team1 VARCHAR(255) NOT NULL,
+    team2 VARCHAR(255) NOT NULL,
 
     winner VARCHAR(255),
 
@@ -183,8 +183,26 @@ CREATE TABLE matches (
         'Completed'
     ) DEFAULT 'Upcoming',
 
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (tournament_id)
+    REFERENCES tournaments(id)
+    ON DELETE CASCADE
 );
+
+ALTER TABLE tournaments
+ADD COLUMN tournament_format ENUM(
+  'Bracket Only',
+  'Round Robin + Bracket'
+) DEFAULT 'Bracket Only';
+
+ALTER TABLE matches
+ADD COLUMN stage ENUM(
+  'Round Robin',
+  'Bracket'
+) DEFAULT 'Bracket',
+ADD COLUMN bracket_round VARCHAR(100),
+ADD COLUMN match_no INT;
 -- =====================================
 -- DUMMY ADMIN
 -- =====================================

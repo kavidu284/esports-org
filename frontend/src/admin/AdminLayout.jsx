@@ -43,7 +43,7 @@ export default function AdminLayout(
           >
             Registrations
           </Link>
-          <Link to ="/admin/matches" 
+          <Link to ="/admin/matches/:tournamentId" 
           className="block p-3 rounded-lg hover:bg-zinc-800">
             Matches
           </Link>
