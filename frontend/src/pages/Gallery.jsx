@@ -4,6 +4,7 @@ import api from "../services/api";
 export default function Gallery() {
   const [images, setImages] = useState([]);
   const [selected, setSelected] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let mounted = true;
@@ -14,6 +15,8 @@ export default function Gallery() {
         if (mounted) setImages(response.data);
       } catch (error) {
         console.error(error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -23,6 +26,19 @@ export default function Gallery() {
       mounted = false;
     };
   }, []);
+    if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-black text-white">
+        <div className="rounded-3xl border border-zinc-800 bg-zinc-950 px-10 py-8 text-center shadow-xl shadow-blue-600/10">
+          <div className="mx-auto mb-5 h-12 w-12 animate-spin rounded-full border-4 border-zinc-700 border-t-blue-500" />
+
+          <p className="font-semibold text-gray-300">
+            Loading tournaments...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black text-white">

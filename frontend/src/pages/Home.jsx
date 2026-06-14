@@ -15,7 +15,7 @@ function LoadingScreen() {
         <div className="relative mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full border border-blue-500/30 bg-blue-500/10">
           <div className="absolute inset-0 animate-ping rounded-full bg-blue-500/20" />
           <div className="absolute h-24 w-24 animate-spin rounded-full border-4 border-zinc-800 border-t-blue-500" />
-          <span className="relative text-4xl">👑</span>
+          <span className="relative text-4xl">GO</span>
         </div>
 
         <h1 className="text-4xl font-black text-blue-500">
