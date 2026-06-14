@@ -12,7 +12,6 @@ export default function RoundRobinAdmin() {
   const [groupName, setGroupName] = useState("");
   const [selectedTeams, setSelectedTeams] = useState({});
 
-  // FIX: loadData must be outside useEffect
   const loadData = useCallback(async () => {
     try {
       const tournamentResponse = await api.get(
@@ -166,6 +165,30 @@ export default function RoundRobinAdmin() {
     }
   };
 
+  const getGroupCode = (groupName) => {
+    const text = String(groupName || "").trim();
+
+    return text
+      .replace(/^group\s+/i, "")
+      .trim();
+  };
+
+  const getSortedGroupTeams = (group) => {
+    return [...(group.teams || [])].sort((a, b) => {
+      return (
+        Number(b.points || 0) - Number(a.points || 0) ||
+        Number(b.bp || 0) - Number(a.bp || 0) ||
+        Number(b.won || 0) - Number(a.won || 0)
+      );
+    });
+  };
+
+  const getSlotCode = (group, index) => {
+    const groupCode = getGroupCode(group.group_name);
+
+    return `${groupCode}${index + 1}`;
+  };
+
   const inputClass =
     "w-full rounded-xl border border-zinc-700 bg-black px-4 py-3 text-white outline-none transition placeholder:text-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20";
 
@@ -185,7 +208,7 @@ export default function RoundRobinAdmin() {
         <div className="flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
           <div>
             <Link
-              to={`/admin/matches/${tournamentId}`}
+              to={`/admin/tournament/${tournamentId}/matches`}
               className="inline-flex items-center rounded-xl border border-zinc-700 bg-black px-5 py-3 font-bold text-white transition hover:border-blue-500 hover:bg-blue-500/10"
             >
               ← Back to Matches
@@ -200,8 +223,8 @@ export default function RoundRobinAdmin() {
             </h1>
 
             <p className="mt-2 max-w-2xl text-gray-400">
-              Create groups, add approved teams, and update round robin
-              standings.
+              Create groups, add approved teams, update standings, and
+              generate bracket slots like A1, A2, B1, B2.
             </p>
 
             <div className="mt-5 flex flex-wrap items-center gap-3">
@@ -273,6 +296,7 @@ export default function RoundRobinAdmin() {
         <div className="space-y-8">
           {groups.map((group) => {
             const teams = group.teams || [];
+            const sortedTeams = getSortedGroupTeams(group);
 
             return (
               <div
@@ -343,9 +367,11 @@ export default function RoundRobinAdmin() {
                   </div>
                 ) : (
                   <div className="overflow-x-auto rounded-2xl border border-zinc-800">
-                    <table className="w-full min-w-[1000px] bg-black">
+                    <table className="w-full min-w-[1150px] bg-black">
                       <thead className="bg-zinc-950">
                         <tr className="border-b border-zinc-800">
+                          <th className={tableHeadClass}>Rank</th>
+                          <th className={tableHeadClass}>Bracket Slot</th>
                           <th className={tableHeadClass}>Team</th>
                           <th className={tableHeadClass}>Full Matches</th>
                           <th className={tableHeadClass}>Played</th>
@@ -358,11 +384,23 @@ export default function RoundRobinAdmin() {
                       </thead>
 
                       <tbody>
-                        {teams.map((team) => (
+                        {sortedTeams.map((team, index) => (
                           <tr
                             key={team.id}
                             className="border-b border-zinc-800 transition hover:bg-blue-500/5"
                           >
+                            <td className={tableCellClass}>
+                              <span className="rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 font-bold text-blue-300">
+                                #{index + 1}
+                              </span>
+                            </td>
+
+                            <td className={tableCellClass}>
+                              <span className="rounded-full border border-green-500/30 bg-green-500/10 px-3 py-1 font-bold text-green-400">
+                                {getSlotCode(group, index)}
+                              </span>
+                            </td>
+
                             <td className={tableCellClass}>
                               <span className="font-bold text-white">
                                 {team.team_name}

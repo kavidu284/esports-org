@@ -43,8 +43,8 @@ export default function AdminLogin() {
       >
         {/* LOGO */}
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-3xl border border-blue-500/30 bg-blue-500/10 text-4xl shadow-lg shadow-blue-600/20">
-            👑
+          <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-3xl border border-blue-500/30 bg-blue-500/10 text-xl shadow-lg shadow-blue-600/20">
+            M
           </div>
 
           <p className="text-sm font-bold uppercase tracking-widest text-blue-400">

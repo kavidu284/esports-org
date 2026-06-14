@@ -19,6 +19,9 @@ export default function MatchAdmin() {
   const [matchDate, setMatchDate] = useState("");
   const [matchTime, setMatchTime] = useState("");
 
+  const [roundRobinGroups, setRoundRobinGroups] = useState([]);
+  const [qualifiedPerGroup, setQualifiedPerGroup] = useState(2);
+
   const bracketRoundOptions = [
     "Round 1",
     "Round 2",
@@ -35,6 +38,19 @@ export default function MatchAdmin() {
     "Lower Bracket Semi Final",
     "Lower Bracket Final",
   ];
+
+  const fetchRoundRobinGroups = async () => {
+    try {
+      const response = await api.get(
+        `/tournaments/${tournamentId}/round-robin-groups`
+      );
+
+      setRoundRobinGroups(response.data || []);
+    } catch (error) {
+      console.error(error);
+      setRoundRobinGroups([]);
+    }
+  };
 
   const fetchMatches = async () => {
     try {
@@ -93,6 +109,11 @@ export default function MatchAdmin() {
         );
 
         setMatches(sortedMatches);
+
+        const groupsResponse = await api.get(
+          `/tournaments/${tournamentId}/round-robin-groups`
+        );
+        setRoundRobinGroups(groupsResponse.data || []);
       } catch (error) {
         console.error(error);
       }
@@ -101,10 +122,97 @@ export default function MatchAdmin() {
     loadData();
   }, [tournamentId]);
 
+  const getGroupCode = (groupName) => {
+    const text = String(groupName || "").trim();
+
+    return text
+      .replace(/^group\s+/i, "")
+      .trim();
+  };
+
+  const roundRobinSeedOptions = roundRobinGroups.flatMap((group) =>
+    Array.from(
+      { length: Number(qualifiedPerGroup) },
+      (_, index) => {
+        const rank = index + 1;
+        const groupCode = getGroupCode(group.group_name);
+        const value = `${groupCode}${rank}`;
+
+        return {
+          value,
+          label: value,
+          groupName: group.group_name,
+          rank,
+        };
+      }
+    )
+  );
+
+  const isRoundRobinSeedParticipant = (participant) => {
+    if (!participant) return false;
+
+    const text = String(participant).trim();
+
+    const found = text.match(/^([A-Za-z0-9]+)(\d+)$/);
+
+    if (!found) return false;
+
+    const groupCode = found[1];
+
+    return roundRobinGroups.some((group) => {
+      const currentGroupCode = getGroupCode(group.group_name);
+
+      return (
+        String(currentGroupCode).toLowerCase() ===
+        String(groupCode).toLowerCase()
+      );
+    });
+  };
+
+  const resolveRoundRobinSeed = (participant) => {
+    if (!participant) return null;
+
+    const text = String(participant).trim();
+
+    const found = text.match(/^([A-Za-z0-9]+)(\d+)$/);
+
+    if (!found) return null;
+
+    const groupCode = found[1];
+    const rank = Number(found[2]);
+
+    const group = roundRobinGroups.find((item) => {
+      const currentGroupCode = getGroupCode(item.group_name);
+
+      return (
+        String(currentGroupCode).toLowerCase() ===
+        String(groupCode).toLowerCase()
+      );
+    });
+
+    if (!group || !Array.isArray(group.teams)) return null;
+
+    const sortedTeams = [...group.teams].sort((a, b) => {
+      return (
+        Number(b.points || 0) - Number(a.points || 0) ||
+        Number(b.bp || 0) - Number(a.bp || 0) ||
+        Number(b.won || 0) - Number(a.won || 0)
+      );
+    });
+
+    return sortedTeams[rank - 1]?.team_name || null;
+  };
+
   const resolveParticipant = (participant, depth = 0) => {
     if (!participant) return "-";
 
     const text = String(participant).trim();
+
+    const roundRobinSeed = resolveRoundRobinSeed(text);
+
+    if (roundRobinSeed) {
+      return roundRobinSeed;
+    }
 
     if (depth > 10) {
       return text;
@@ -188,6 +296,7 @@ export default function MatchAdmin() {
       setMatchTime("");
 
       fetchMatches();
+      fetchRoundRobinGroups();
     } catch (error) {
       console.error(error);
       alert("Failed to create match");
@@ -203,6 +312,7 @@ export default function MatchAdmin() {
       });
 
       fetchMatches();
+      fetchRoundRobinGroups();
     } catch (error) {
       console.error(error);
       alert("Failed to update winner");
@@ -241,8 +351,11 @@ export default function MatchAdmin() {
   const isFutureParticipant = (participant) => {
     if (!participant) return false;
 
-    return /^(Winner|Loser)\s+of\s+Match\s+(\d+)$/i.test(
-      String(participant).trim()
+    const text = String(participant).trim();
+
+    return (
+      /^(Winner|Loser)\s+of\s+Match\s+(\d+)$/i.test(text) ||
+      isRoundRobinSeedParticipant(text)
     );
   };
 
@@ -287,8 +400,8 @@ export default function MatchAdmin() {
             </h1>
 
             <p className="mt-2 max-w-2xl text-gray-400">
-              Create matches, manage match schedule, and update winners
-              for this tournament.
+              Create bracket matches, manage match schedule, and update
+              winners for this tournament.
             </p>
 
             <div className="mt-5 flex flex-wrap items-center gap-3">
@@ -306,20 +419,32 @@ export default function MatchAdmin() {
             </div>
           </div>
 
-          {tournament?.tournament_format === "Round Robin + Bracket" && (
-            <Link
-              to={`/admin/tournament/${tournamentId}/matches/round-robin`}
-              className="rounded-xl bg-blue-600 px-6 py-3 text-center font-bold text-white shadow-lg shadow-blue-600/30 transition hover:bg-blue-700"
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <button
+              type="button"
+              onClick={fetchRoundRobinGroups}
+              className="rounded-xl border border-blue-500/40 bg-black px-6 py-3 text-center font-bold text-blue-300 transition hover:bg-blue-500/10"
             >
-              Manage Round Robin Groups
-            </Link>
-          )}
+              Refresh Groups
+            </button>
+
+            {tournament?.tournament_format === "Round Robin + Bracket" && (
+              <Link
+                to={`/admin/tournament/${tournamentId}/matches/round-robin`}
+                className="rounded-xl bg-blue-600 px-6 py-3 text-center font-bold text-white shadow-lg shadow-blue-600/30 transition hover:bg-blue-700"
+              >
+                Manage Round Robin Groups
+              </Link>
+            )}
+          </div>
         </div>
       </div>
 
       {/* TOURNAMENT TITLE */}
       <div className="mb-8 rounded-3xl border border-zinc-800 bg-zinc-950 p-6 shadow-xl shadow-black/30">
-        <p className="text-sm text-gray-500">Tournament</p>
+        <p className="text-sm text-gray-500">
+          Tournament
+        </p>
 
         <h2 className="mt-2 text-3xl font-black text-white">
           {tournament?.title || tournament?.tournament_name || "Loading..."}
@@ -338,7 +463,19 @@ export default function MatchAdmin() {
           </h2>
 
           <p className="mt-2 text-gray-400">
-            Use team names or future match references like Winner of Match 1.
+            For Round Robin + Bracket, use slots like A1, B2, B1, A2.
+            They will auto-resolve based on group standings.
+          </p>
+        </div>
+
+        <div className="mb-6 rounded-2xl border border-blue-500/20 bg-blue-500/5 p-5">
+          <p className="font-bold text-blue-300">
+            Example Bracket Flow
+          </p>
+
+          <p className="mt-2 text-sm text-gray-400">
+            Match 1: A1 vs B2 | Match 2: B1 vs A2 | Final:
+            Winner of Match 1 vs Winner of Match 2
           </p>
         </div>
 
@@ -370,6 +507,25 @@ export default function MatchAdmin() {
             >
               <option value="Bracket">Bracket</option>
               <option value="Round Robin">Round Robin</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-semibold text-gray-300">
+              Qualified Slots
+            </label>
+
+            <select
+              value={qualifiedPerGroup}
+              onChange={(e) =>
+                setQualifiedPerGroup(Number(e.target.value))
+              }
+              className={inputClass}
+            >
+              <option value={1}>Top 1 from each group</option>
+              <option value={2}>Top 2 from each group</option>
+              <option value={3}>Top 3 from each group</option>
+              <option value={4}>Top 4 from each group</option>
             </select>
           </div>
 
@@ -415,7 +571,7 @@ export default function MatchAdmin() {
               value={team1}
               onChange={(e) => setTeam1(e.target.value)}
               className={inputClass}
-              placeholder="Team name / Winner of Match 1"
+              placeholder="A1 / Team name / Winner of Match 1"
             />
           </div>
 
@@ -429,7 +585,7 @@ export default function MatchAdmin() {
               value={team2}
               onChange={(e) => setTeam2(e.target.value)}
               className={inputClass}
-              placeholder="Team name / Loser of Match 3"
+              placeholder="B2 / Team name / Loser of Match 3"
             />
           </div>
 
@@ -459,7 +615,17 @@ export default function MatchAdmin() {
 
         <datalist id="teamOptions">
           {teams.map((team) => (
-            <option key={team.id} value={team.team_name} />
+            <option
+              key={team.id}
+              value={team.team_name}
+            />
+          ))}
+
+          {roundRobinSeedOptions.map((option) => (
+            <option
+              key={`rr-slot-${option.value}`}
+              value={option.value}
+            />
           ))}
 
           {matches
@@ -481,6 +647,50 @@ export default function MatchAdmin() {
             ))}
         </datalist>
       </div>
+
+      {/* QUALIFIED SLOT PREVIEW */}
+      {roundRobinSeedOptions.length > 0 && (
+        <div className="mb-8 rounded-3xl border border-zinc-800 bg-zinc-950 p-8 shadow-xl shadow-black/30">
+          <div className="mb-6">
+            <p className="text-sm font-bold uppercase tracking-widest text-blue-400">
+              Round Robin Qualification
+            </p>
+
+            <h2 className="mt-2 text-2xl font-bold">
+              Auto Bracket Slots
+            </h2>
+
+            <p className="mt-2 text-gray-400">
+              These slots can be used as Team 1 or Team 2 in bracket matches.
+            </p>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {roundRobinSeedOptions.map((option) => {
+              const resolvedTeam = resolveRoundRobinSeed(option.value);
+
+              return (
+                <div
+                  key={`preview-${option.value}`}
+                  className="rounded-2xl border border-zinc-800 bg-black p-5"
+                >
+                  <p className="text-2xl font-black text-blue-400">
+                    {option.value}
+                  </p>
+
+                  <p className="mt-2 text-sm text-gray-500">
+                    {option.groupName} Rank #{option.rank}
+                  </p>
+
+                  <p className="mt-3 font-bold text-white">
+                    {resolvedTeam || "Waiting standings"}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* MATCH SCHEDULE */}
       <div className="rounded-3xl border border-zinc-800 bg-zinc-950 p-8 shadow-xl shadow-black/30">
@@ -557,15 +767,33 @@ export default function MatchAdmin() {
                     </td>
 
                     <td className={tableCellClass}>
-                      <span className="font-bold text-white">
-                        {getTeam1(match)}
-                      </span>
+                      <div>
+                        <span className="font-bold text-white">
+                          {getTeam1(match)}
+                        </span>
+
+                        {isFutureParticipant(match.team1) &&
+                          getTeam1(match) !== match.team1 && (
+                            <p className="mt-1 text-xs text-blue-400">
+                              Source: {match.team1}
+                            </p>
+                          )}
+                      </div>
                     </td>
 
                     <td className={tableCellClass}>
-                      <span className="font-bold text-white">
-                        {getTeam2(match)}
-                      </span>
+                      <div>
+                        <span className="font-bold text-white">
+                          {getTeam2(match)}
+                        </span>
+
+                        {isFutureParticipant(match.team2) &&
+                          getTeam2(match) !== match.team2 && (
+                            <p className="mt-1 text-xs text-blue-400">
+                              Source: {match.team2}
+                            </p>
+                          )}
+                      </div>
                     </td>
 
                     <td className={tableCellClass}>
